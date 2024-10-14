@@ -18,8 +18,14 @@ public class ChatLastMessageHandler extends BaseHandlerWrapper {
         TdApi.Chat chat = getBot().getChat(lastMessage.chatId);
         synchronized (chat) {
             chat.lastMessage = lastMessage.lastMessage;
-            //todo posttion
-
+            getBot().send(
+                    new ChatPositionHandler.ChatPositionUpdateEvent(
+                            new ChatPositionHandler.ChatPositionUpdateEvent.Data(
+                                    lastMessage.chatId,
+                                    lastMessage.positions
+                            )
+                    )
+            );
         }
     }
 

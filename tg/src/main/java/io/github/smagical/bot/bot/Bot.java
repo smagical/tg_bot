@@ -61,10 +61,9 @@ public class Bot extends MessageDispatch implements io.github.smagical.bot.Bot {
         } catch (Client.ExecutionException error) {
             throw new IOError(new IOException("Write access to the current directory is required"));
         }
-
-        this.client = Client.create(this.dispatchHandler, LogHandler.getInstance(), null);
         initHandler();
         initListener();
+        this.client = Client.create(this.dispatchHandler, LogHandler.getInstance(), null);
 
     }
 

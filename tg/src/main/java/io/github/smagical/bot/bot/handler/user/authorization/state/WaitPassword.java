@@ -26,7 +26,7 @@ public class WaitPassword extends RetryBaseHandlerAndListenerWrapper<WaitPasswor
 
     @Override
     public int[] support() {
-        return new int[]{TdApi.AuthorizationStateWaitCode.CONSTRUCTOR};
+        return new int[]{TdApi.AuthorizationStateWaitPassword.CONSTRUCTOR};
     }
 
     @Override

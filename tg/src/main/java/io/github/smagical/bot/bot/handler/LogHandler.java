@@ -9,7 +9,7 @@ public class LogHandler implements Client.LogMessageHandler,Client.ExceptionHand
 
     @Override
     public void onLogMessage(int verbosityLevel, String message) {
-        log.info(message);
+        log.info("\n{}",message.toString());
     }
 
     public static LogHandler getInstance() {

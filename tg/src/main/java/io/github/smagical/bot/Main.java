@@ -1,11 +1,7 @@
 package io.github.smagical.bot;
 
 import io.github.smagical.bot.bot.Bot;
-import io.github.smagical.bot.bot.HandlerWrapper;
-import io.github.smagical.bot.bot.listener.user.authorization.state.LoginListener;
-import io.github.smagical.bot.event.user.LoginEvent;
 import lombok.extern.slf4j.Slf4j;
-import org.drinkless.tdlib.TdApi;
 import org.drinkless.tdlib.example.Example;
 
 import java.io.File;
@@ -31,32 +27,6 @@ public class Main {
         id = "9996610099";
         Bot bot = new Bot();
         bot.login();
-        bot.addListener(
-                new LoginListener(bot){
-                    @Override
-                    public void onListener(LoginEvent loginEvent) {
-                        if (loginEvent instanceof LoginEvent.LoginSuccessEvent) {
-                            bot.getClient()
-                                    .send(
-                                            new TdApi.LoadChats(
-                                                    new TdApi.ChatListMain(), 1000
-                                            ),
-                                            new HandlerWrapper() {
-                                                @Override
-                                                public Bot getBot() {
-                                                    return bot;
-                                                }
-
-                                                @Override
-                                                public void onResult(TdApi.Object object) {
-                                                  log.info(object.toString());
-                                                }
-                                            }
-                                    );
-                        }
-                    }
-                }
-        );
         lock.lock();
         condition.await();
         Example.main(args);

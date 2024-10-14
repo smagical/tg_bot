@@ -5,6 +5,9 @@ import io.github.smagical.bot.bot.handler.base.BaseHandlerWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.drinkless.tdlib.TdApi;
 
+/**
+ * 点击的类型 比如👍👎 🎉
+ */
 @Slf4j
 public class ChatAvailableReactionsHandler extends BaseHandlerWrapper {
     public ChatAvailableReactionsHandler(Bot bot) {

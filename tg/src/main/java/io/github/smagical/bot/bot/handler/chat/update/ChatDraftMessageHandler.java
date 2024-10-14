@@ -18,7 +18,9 @@ public class ChatDraftMessageHandler extends BaseHandlerWrapper {
         TdApi.Chat chat = getBot().getChat(chatDraftMessage.chatId);
         synchronized (chat) {
             chat.draftMessage = chatDraftMessage.draftMessage;
-            //todo post
+            getBot().send(new ChatPositionHandler.ChatPositionUpdateEvent(
+                    new ChatPositionHandler.ChatPositionUpdateEvent.Data(chatDraftMessage.chatId,chatDraftMessage.positions)
+            ));
         }
     }
 

@@ -49,7 +49,7 @@ public class WaitEmailCodeHandler extends RetryBaseHandlerAndListenerWrapper<Wai
 
     @Override
     public int[] support() {
-        return new int[]{TdApi.AuthorizationStateWaitEmailAddress.CONSTRUCTOR};
+        return new int[]{TdApi.AuthorizationStateWaitEmailCode.CONSTRUCTOR};
     }
 
 

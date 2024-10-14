@@ -24,6 +24,6 @@ public class ClosedHandler extends BaseHandlerWrapper {
 
     @Override
     public int[] support() {
-        return new int[]{TdApi.AuthorizationStateLoggingOut.CONSTRUCTOR};
+        return new int[]{TdApi.AuthorizationStateClosed.CONSTRUCTOR};
     }
 }

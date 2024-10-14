@@ -64,7 +64,7 @@
     <!-- level="info"代表基础日志级别为info。用来设置打印级别，大小写无关：TRACE, DEBUG, INFO, WARN, ERROR, ALL 和 OFF，还有一个特殊值INHERITED或者同义词NULL，代表强制执行上级的级别。 -->
     <root level="TRACE">
         <!-- 引入控制台输出规则 -->
-<!--        <appender-ref ref="consoleLog" />-->
+        <appender-ref ref="consoleLog" />
 <!--        <appender-ref ref="fileInfoLog" />-->
 <!--        <appender-ref ref="fileErrorLog" />-->
     </root>

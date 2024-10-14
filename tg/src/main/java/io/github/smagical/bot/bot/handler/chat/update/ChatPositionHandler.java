@@ -2,9 +2,18 @@ package io.github.smagical.bot.bot.handler.chat.update;
 
 import io.github.smagical.bot.bot.Bot;
 import io.github.smagical.bot.bot.handler.base.BaseHandlerWrapper;
+import io.github.smagical.bot.event.BaseEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.drinkless.tdlib.TdApi;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+/**
+ * chat在列表的位置
+ *
+ */
 @Slf4j
 public class ChatPositionHandler extends BaseHandlerWrapper {
     public ChatPositionHandler(Bot bot) {
@@ -14,21 +23,40 @@ public class ChatPositionHandler extends BaseHandlerWrapper {
     @Override
     protected void handle(TdApi.Object object) {
         TdApi.UpdateChatPosition chatPosition = (TdApi.UpdateChatPosition) object;
-        log.debug("\n{}",chatPosition.toString());
+        log.debug("\n更新chat在列表的位置\n{}",chatPosition.toString());
+        getBot().send(new ChatPositionUpdateEvent(
+                new ChatPositionUpdateEvent.Data(
+                        chatPosition.chatId,chatPosition.position
+                )
+        ));
+    }
 
-        //todo 麻烦
+    public static class ChatPositionUpdateEvent extends BaseEvent<ChatPositionUpdateEvent.Data>{
+        public final static class Data{
+            private final long chatId;
+            private final List<TdApi.ChatPosition> chatPosition;
 
-        TdApi.Chat chat = getBot().getChat(chatPosition.chatId);
-        if (chat != null) {
-            synchronized (chat){
-
+            public Data(long chatId, List<TdApi.ChatPosition> chatPosition) {
+                this.chatId = chatId;
+                this.chatPosition = Collections.unmodifiableList(chatPosition);
             }
+
+            public Data( long chatId,TdApi.ChatPosition... chatPositions) {
+                this.chatPosition = Arrays.asList(chatPositions);
+                this.chatId = chatId;
+            }
+            public long getChatId() {
+                return chatId;
+            }
+            public List<TdApi.ChatPosition> getChatPosition() {
+                return chatPosition;
+            }
+        }
+        ChatPositionUpdateEvent(ChatPositionUpdateEvent.Data code) {
+            super(code);
         }
     }
 
-    protected void solveChat(TdApi.Chat chat,TdApi.UpdateChatPosition chatPosition) {
-
-    }
 
     @Override
     public int[] support() {
