@@ -39,3 +39,7 @@ build/
 .DS_Store
 
 /**/tdlib
+tddb
+tdlib.log
+*.log
+**/**/*.log

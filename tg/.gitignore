@@ -38,4 +38,4 @@ build/
 
 ### Mac OS ###
 .DS_Store
-src/main/java/io/github/smagical/tg/not.text
+src/main/java/io/github/smagical/bot/not.text
