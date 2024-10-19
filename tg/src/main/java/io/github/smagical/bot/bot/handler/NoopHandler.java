@@ -49,6 +49,7 @@ public class NoopHandler implements HandlerWrapper {
         list.add(TdApi.UpdateProfileAccentColors.CONSTRUCTOR);
         list.add(TdApi.UpdateAccentColors.CONSTRUCTOR);
         list.add(TdApi.UpdateAnimationSearchParameters.CONSTRUCTOR);
+        list.add(TdApi.UpdateAvailableMessageEffects.CONSTRUCTOR);
         return list;
     }
 }

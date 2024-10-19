@@ -5,19 +5,22 @@ import io.github.smagical.bot.bot.handler.LogHandler;
 import io.github.smagical.bot.bot.handler.UpdateOptionHandler;
 import io.github.smagical.bot.bot.handler.chat.ChatDispatchHandler;
 import io.github.smagical.bot.bot.handler.chat.ChatLoadListener;
-import io.github.smagical.bot.bot.handler.user.update.UpdateUserDispatchHandler;
 import io.github.smagical.bot.bot.handler.user.authorization.state.AuthorizationStateDispatchHandler;
+import io.github.smagical.bot.bot.handler.user.update.UpdateUserDispatchHandler;
 import io.github.smagical.bot.bot.listener.user.UserListener;
 import io.github.smagical.bot.bot.listener.user.authorization.state.AuthorizationStateListener;
 import io.github.smagical.bot.bot.listener.user.chat.LoginForChatInitListener;
+import io.github.smagical.bot.bot.listener.user.chat.message.MessageDispatchListener;
+import io.github.smagical.bot.bot.model.ChatMap;
+import io.github.smagical.bot.bot.model.UserMap;
 import io.github.smagical.bot.bus.MessageDispatch;
+import io.github.smagical.bot.event.user.LoginEvent;
+import io.github.smagical.bot.listener.Listener;
 import org.drinkless.tdlib.Client;
 import org.drinkless.tdlib.TdApi;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOError;
 import java.io.IOException;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class Bot extends MessageDispatch implements io.github.smagical.bot.Bot {
 
@@ -26,8 +29,9 @@ public class Bot extends MessageDispatch implements io.github.smagical.bot.Bot {
     private DispatchHandler dispatchHandler;
     private LoginType loginType = LoginType.PHONE_NUMBER;
     private ChatMap chatMap = new ChatMap();
-
-
+    private UserMap users = new UserMap();
+    private volatile Boolean isRunning = false;
+    private volatile TdApi.User me = null;
 
 
     private String phoneNumber;
@@ -41,29 +45,48 @@ public class Bot extends MessageDispatch implements io.github.smagical.bot.Bot {
     }
 
     public void login() {
+        checkRunning();
         login(LoginType.OCR);
     }
 
     public void login(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-        this.id = phoneNumber;
-        login(LoginType.PHONE_NUMBER);
+        checkRunning();
+        synchronized (isRunning){
+            this.phoneNumber = phoneNumber;
+            this.id = phoneNumber;
+            login(LoginType.PHONE_NUMBER);
+        }
     }
 
     private void login(LoginType loginType) {
-        this.loginType = loginType;
-        this.dispatchHandler = new DispatchHandler(this);
-        Client.setLogMessageHandler(0, LogHandler.getInstance());
-        // disable TDLib log and redirect fatal errors and plain log messages to a file
-        try {
-            Client.execute(new TdApi.SetLogVerbosityLevel(0));
-            Client.execute(new TdApi.SetLogStream(new TdApi.LogStreamFile("tdlib.log", 1 << 27, false)));
-        } catch (Client.ExecutionException error) {
-            throw new IOError(new IOException("Write access to the current directory is required"));
+        checkRunning();
+        synchronized (isRunning) {
+            this.loginType = loginType;
+            this.dispatchHandler = new DispatchHandler(this);
+            Client.setLogMessageHandler(0, LogHandler.getInstance());
+            // disable TDLib log and redirect fatal errors and plain log messages to a file
+            try {
+                Client.execute(new TdApi.SetLogVerbosityLevel(0));
+                Client.execute(new TdApi.SetLogStream(new TdApi.LogStreamFile("tdlib.log", 1 << 27, false)));
+            } catch (Client.ExecutionException error) {
+                throw new IOError(new IOException("Write access to the current directory is required"));
+            }
+            initHandler();
+            initListener();
+            this.client = Client.create(this.dispatchHandler, LogHandler.getInstance(), null);
+            isRunning = true;
+            BotConfig.getInstance().initThreadExecutor();
         }
-        initHandler();
-        initListener();
-        this.client = Client.create(this.dispatchHandler, LogHandler.getInstance(), null);
+
+
+    }
+
+    public void logout(){
+        synchronized (isRunning) {
+            if (!isRunning) return;
+            this.isRunning = false;
+            BotConfig.getInstance().stopThreadExecutor();
+        }
 
     }
 
@@ -79,12 +102,13 @@ public class Bot extends MessageDispatch implements io.github.smagical.bot.Bot {
 
 
         addListener(new AuthorizationStateListener(this));
-        addListener(new UserListener());
-
-
+        addListener(new UserListener(this));
 
         addListener(new ChatLoadListener(this));
         addListener(new LoginForChatInitListener(this));
+        addListener(new MessageDispatchListener(this));
+
+        addListener(new GetMeHandler());
     }
 
 
@@ -105,16 +129,6 @@ public class Bot extends MessageDispatch implements io.github.smagical.bot.Bot {
         return this.loginType;
     }
 
-    public boolean add(TdApi.Object chat) {
-        Long id = null;
-        if (chat instanceof TdApi.SecretChat) {
-            id = (long) ((TdApi.SecretChat)chat).id;
-        }else {
-            id = ((TdApi.Chat)chat).id;
-        }
-        chatMap.put(id, chat);
-        return true;
-    }
 
     public boolean addChat(TdApi.Chat chat) {
         chatMap.put(chat.id, chat);
@@ -134,59 +148,63 @@ public class Bot extends MessageDispatch implements io.github.smagical.bot.Bot {
         return chatMap.getSecretChat(id);
     }
 
-    public TdApi.Object get(long id){
-        return chatMap.get(id);
-    }
-
-    public boolean remove(long id) {
+    public boolean removeChat(long id) {
         return chatMap.remove(id);
     }
 
-    private class ChatMap {
-        private static final long serialVersionUID = 1L;
-        private ConcurrentHashMap<Long, TdApi.SecretChat> secretChatMap = new ConcurrentHashMap<>();
-        private ConcurrentHashMap<Long, TdApi.Chat> chatMap = new ConcurrentHashMap<>();
+    public TdApi.User getUser(long id) {
+        return users.getUser(id);
+    }
+    public TdApi.UserFullInfo getUserFullInfo(long id) {
+        return users.getFullInfo(id);
+    }
+    public UserMap.Entity getUserEntity(long id) {
+        return users.getEntity(id);
+    }
+    public void addUser(TdApi.User user) {
+        users.put(user);
+    }
+    public void addUserFullInfo(Long userId,TdApi.UserFullInfo userFullInfo) {
+        users.put(userId,userFullInfo);
+    }
+    public boolean removeUser(long id) {
+        return users.remove(id);
+    }
 
-        public TdApi.Object put(@NotNull Long key, @NotNull TdApi.Object value) {
-            if (value instanceof TdApi.SecretChat) {
-                return secretChatMap.put(key, (TdApi.SecretChat) value);
-            }else {
-                return chatMap.put(key, (TdApi.Chat) value);
+    private void checkRunning() {
+        synchronized (isRunning){
+            if (isRunning) {
+                throw new IllegalStateException("Bot is already running");
+            }
+        }
+    }
+
+
+
+
+    private class GetMeHandler implements Listener<LoginEvent.LoginSuccessEvent> , Client.ResultHandler{
+        private int retryCount = 3;
+        public GetMeHandler() {
+        }
+
+        @Override
+        public void onResult(TdApi.Object object) {
+            if (object.getConstructor() == TdApi.User.CONSTRUCTOR)
+                Bot.this.me = (TdApi.User) object;
+            else if (retryCount > 0){
+                retryCount--;
+                onListener(null);
             }
 
         }
 
-        public TdApi.Object putIfAbsent(Long key, TdApi.Object value) {
-            if (value instanceof TdApi.SecretChat) {
-                return secretChatMap.putIfAbsent(key, (TdApi.SecretChat) value);
-            }else {
-                return chatMap.putIfAbsent(key, (TdApi.Chat) value);
-            }
-        }
 
-        public TdApi.Object get(Long key) {
-            TdApi.Object result =  chatMap.get(key);
-            if (result == null) {
-                result = secretChatMap.get(key);
-            }
-            return result;
-        }
-
-        public TdApi.Chat getChat(Long key) {
-            return chatMap.get(key);
-        }
-
-        public TdApi.SecretChat getSecretChat(Long key) {
-            return secretChatMap.get(key);
-        }
-
-        public boolean remove(long id) {
-            if (chatMap.remove(id) != null) {
-                return true;
-            }else if (secretChatMap.remove(id) != null) {
-               return true;
-            }
-            return false;
+        @Override
+        public void onListener(LoginEvent.LoginSuccessEvent event) {
+            getClient()
+                    .send(
+                            new TdApi.GetMe(),this
+                    );
         }
     }
 

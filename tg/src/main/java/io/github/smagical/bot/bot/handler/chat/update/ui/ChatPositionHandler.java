@@ -1,4 +1,4 @@
-package io.github.smagical.bot.bot.handler.chat.update;
+package io.github.smagical.bot.bot.handler.chat.update.ui;
 
 import io.github.smagical.bot.bot.Bot;
 import io.github.smagical.bot.bot.handler.base.BaseHandlerWrapper;
@@ -52,7 +52,7 @@ public class ChatPositionHandler extends BaseHandlerWrapper {
                 return chatPosition;
             }
         }
-        ChatPositionUpdateEvent(ChatPositionUpdateEvent.Data code) {
+        public ChatPositionUpdateEvent(ChatPositionUpdateEvent.Data code) {
             super(code);
         }
     }

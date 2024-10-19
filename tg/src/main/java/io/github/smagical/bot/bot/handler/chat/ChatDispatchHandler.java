@@ -4,6 +4,9 @@ import io.github.smagical.bot.bot.Bot;
 import io.github.smagical.bot.bot.handler.DispatchHandler;
 import io.github.smagical.bot.bot.handler.chat.update.*;
 import io.github.smagical.bot.bot.handler.chat.update.info.*;
+import io.github.smagical.bot.bot.handler.chat.update.message.ChatDraftMessageHandler;
+import io.github.smagical.bot.bot.handler.chat.update.message.ChatLastMessageHandler;
+import io.github.smagical.bot.bot.handler.chat.update.ui.ChatPositionHandler;
 import io.github.smagical.bot.bot.handler.chat.update.ui.ChatBackgroundHandler;
 import io.github.smagical.bot.bot.handler.chat.update.ui.ChatThemeHandler;
 

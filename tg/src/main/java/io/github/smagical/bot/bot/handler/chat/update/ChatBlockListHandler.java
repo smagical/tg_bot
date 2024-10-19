@@ -18,6 +18,7 @@ public class ChatBlockListHandler extends BaseHandlerWrapper {
         TdApi.Chat chat = getBot().getChat(chatBlockList.chatId);
         synchronized (chat) {
             chat.blockList = chatBlockList.blockList;
+
         }
     }
 

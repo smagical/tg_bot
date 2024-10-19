@@ -1,7 +1,8 @@
-package io.github.smagical.bot.bot.handler.chat.update;
+package io.github.smagical.bot.bot.handler.chat.update.message;
 
 import io.github.smagical.bot.bot.Bot;
 import io.github.smagical.bot.bot.handler.base.BaseHandlerWrapper;
+import io.github.smagical.bot.bot.handler.chat.update.ui.ChatPositionHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.drinkless.tdlib.TdApi;
 
@@ -26,6 +27,9 @@ public class ChatLastMessageHandler extends BaseHandlerWrapper {
                             )
                     )
             );
+            getBot().send(
+                    new LastMessageEvent(lastMessage)
+            );
         }
     }
 
@@ -34,5 +38,11 @@ public class ChatLastMessageHandler extends BaseHandlerWrapper {
         return new int[] {
                 TdApi.UpdateChatLastMessage.CONSTRUCTOR
         };
+    }
+
+    public class LastMessageEvent extends io.github.smagical.bot.event.message.MessageEvent<TdApi.UpdateChatLastMessage> {
+        private LastMessageEvent(TdApi.UpdateChatLastMessage code) {
+            super(code);
+        }
     }
 }

@@ -1,10 +1,15 @@
-package io.github.smagical.bot.bot.handler.chat.update;
+package io.github.smagical.bot.bot.handler.chat.update.message;
 
 import io.github.smagical.bot.bot.Bot;
 import io.github.smagical.bot.bot.handler.base.BaseHandlerWrapper;
+import io.github.smagical.bot.bot.handler.chat.update.ui.ChatPositionHandler;
+import io.github.smagical.bot.event.message.MessageEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.drinkless.tdlib.TdApi;
 
+/**
+ * 草稿信息
+ */
 @Slf4j
 public class ChatDraftMessageHandler extends BaseHandlerWrapper {
     public ChatDraftMessageHandler(Bot bot) {
@@ -21,6 +26,9 @@ public class ChatDraftMessageHandler extends BaseHandlerWrapper {
             getBot().send(new ChatPositionHandler.ChatPositionUpdateEvent(
                     new ChatPositionHandler.ChatPositionUpdateEvent.Data(chatDraftMessage.chatId,chatDraftMessage.positions)
             ));
+            getBot().send(
+                    new DraftMessageEvent(chatDraftMessage)
+            );
         }
     }
 
@@ -29,5 +37,11 @@ public class ChatDraftMessageHandler extends BaseHandlerWrapper {
         return new int[] {
                 TdApi.UpdateChatDraftMessage.CONSTRUCTOR
         };
+    }
+
+    public class DraftMessageEvent extends MessageEvent<TdApi.UpdateChatDraftMessage> {
+        private DraftMessageEvent(TdApi.UpdateChatDraftMessage code) {
+            super(code);
+        }
     }
 }

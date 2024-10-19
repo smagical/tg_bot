@@ -1,4 +1,4 @@
-package io.github.smagical.bot.bot.handler.chat.update;
+package io.github.smagical.bot.bot.handler.chat.update.info;
 
 import io.github.smagical.bot.bot.Bot;
 import io.github.smagical.bot.bot.handler.base.BaseHandlerWrapper;
