@@ -252,7 +252,7 @@ public final class Example {
             if (!haveFullMainChatList && limit > mainChatList.size()) {
                 // send LoadChats request if there are some unknown chats and have not enough known chats
                 //new TdApi.ChatListMain(), limit - mainChatList.size()
-                client.send(new TdApi.LoadChats(new TdApi.ChatListArchive(),limit - mainChatList.size()), new Client.ResultHandler() {
+                client.send(new TdApi.LoadChats(new TdApi.ChatListMain(),limit - mainChatList.size()), new Client.ResultHandler() {
                     @Override
                     public void onResult(TdApi.Object object) {
                         switch (object.getConstructor()) {

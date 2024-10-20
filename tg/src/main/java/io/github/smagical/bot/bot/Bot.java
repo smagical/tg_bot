@@ -35,8 +35,14 @@ public class Bot extends MessageDispatch implements io.github.smagical.bot.Bot {
 
 
     private String phoneNumber;
+    private String botToken;
+
+    public String getBotToken() {
+        return botToken;
+    }
+
     public static enum LoginType {
-        PHONE_NUMBER, OCR
+        PHONE_NUMBER, OCR,BOT;
     }
 
     public Bot() {
@@ -44,17 +50,25 @@ public class Bot extends MessageDispatch implements io.github.smagical.bot.Bot {
                 .getId());
     }
 
-    public void login() {
+    public void loginByOcr() {
         checkRunning();
         login(LoginType.OCR);
     }
 
-    public void login(String phoneNumber) {
+    public void loginByPthone(String phoneNumber) {
         checkRunning();
         synchronized (isRunning){
             this.phoneNumber = phoneNumber;
             this.id = phoneNumber;
             login(LoginType.PHONE_NUMBER);
+        }
+    }
+    public void loginByBotToken() {
+        checkRunning();
+        synchronized (isRunning){
+            this.botToken = phoneNumber;
+            this.id = botToken;
+            login(LoginType.BOT);
         }
     }
 
@@ -152,6 +166,10 @@ public class Bot extends MessageDispatch implements io.github.smagical.bot.Bot {
         return chatMap.remove(id);
     }
 
+    public ChatMap getAllChats() {
+        return chatMap;
+    }
+
     public TdApi.User getUser(long id) {
         return users.getUser(id);
     }
@@ -171,6 +189,13 @@ public class Bot extends MessageDispatch implements io.github.smagical.bot.Bot {
         return users.remove(id);
     }
 
+    public UserMap getAllUser() {
+        return users;
+    }
+
+    public TdApi.User getMe(){
+        return me;
+    }
     private void checkRunning() {
         synchronized (isRunning){
             if (isRunning) {

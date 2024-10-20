@@ -19,6 +19,14 @@
             <pattern>%date %level [%thread] %logger [%file:%line] %msg%n</pattern>
         </layout>
     </appender>
+    <!-- 配置项， 通过此节点配置日志输出位置（控制台、文件、数据库）、输出格式等-->
+    <!-- ConsoleAppender代表输出到控制台 -->
+    <appender name="cmdLog" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- layout代表输出格式 -->
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%msg%n</pattern>
+        </layout>
+    </appender>
     <!-- 日志输出文件 -->
     <appender name="fileInfoLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <encoder>
@@ -59,10 +67,12 @@
             <maxHistory>60</maxHistory>
         </rollingPolicy>
     </appender>
-
+    <logger name="io.github.smagical.bot.cmd" level="INFO" additivity="false">
+        <appender-ref ref="cmdLog" />
+    </logger>
     <!-- 根节点，表名基本的日志级别，里面可以由零个或多个<appender-ref>元素，标识那些appender将会添加到这个loger。-->
     <!-- level="info"代表基础日志级别为info。用来设置打印级别，大小写无关：TRACE, DEBUG, INFO, WARN, ERROR, ALL 和 OFF，还有一个特殊值INHERITED或者同义词NULL，代表强制执行上级的级别。 -->
-    <root level="TRACE">
+    <root level="INFO">
         <!-- 引入控制台输出规则 -->
         <appender-ref ref="consoleLog" />
         <appender-ref ref="fileInfoLog" />

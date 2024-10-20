@@ -1,5 +1,7 @@
 package io.github.smagical.bot;
 
+import io.github.smagical.bot.cmd.MainCmd;
+import io.github.smagical.bot.cmd.SpiderCmdHandler;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.InvocationTargetException;
@@ -19,8 +21,12 @@ public class Main {
 //        new File("tddb").deleteOnExit();
 //        String id= "999663"+ new Random().nextInt(1000,9999);
 //        id = "9996610099";
-        io.github.smagical.bot.bot.Bot bot = new io.github.smagical.bot.bot.Bot();
-        bot.login();
+            io.github.smagical.bot.bot.Bot bot = new io.github.smagical.bot.bot.Bot();
+            bot.addListener(new MainCmd.CmdListener(bot));
+            bot.loginByOcr();
+            MainCmd.addCmd(SpiderCmdHandler.getInstance());;
+            MainCmd.printMainMenu();
+
 //        lock.lock();
 //        condition.await();
 

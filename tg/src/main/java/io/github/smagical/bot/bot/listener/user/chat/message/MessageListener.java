@@ -11,20 +11,19 @@ public class MessageListener implements Listener<ChatLastMessageHandler.LastMess
     @Override
     public void onListener(ChatLastMessageHandler.LastMessageEvent event) {
 
-
         TdApi.UpdateChatLastMessage lastMessage = event.getData().getData();
         TdApi.Message message = lastMessage.lastMessage;
         if (message == null) return;
 
         //todo实现 只支持text
-        if (message.content.getConstructor() == TdApi.MessageText.CONSTRUCTOR){
-            TdApi.MessageText messageText = (TdApi.MessageText)message.content;
-            String contentText = messageText.text.text;
-
-        }else if (message.content.getConstructor() == TdApi.MessagePhoto.CONSTRUCTOR){
-            TdApi.MessagePhoto messageText = (TdApi.MessagePhoto)message.content;
-            String contentText = messageText.caption.text;
-        }
+//        if (message.content.getConstructor() == TdApi.MessageText.CONSTRUCTOR){
+//            TdApi.MessageText messageText = (TdApi.MessageText)message.content;
+//            String contentText = messageText.text.text;
+//
+//        }else if (message.content.getConstructor() == TdApi.MessagePhoto.CONSTRUCTOR){
+//            TdApi.MessagePhoto messageText = (TdApi.MessagePhoto)message.content;
+//            String contentText = messageText.caption.text;
+//        }
 
         long messageId = message.id;
         long senderId = 0;

@@ -30,7 +30,10 @@ public  class WaitPhoneNumberHandler extends BaseHandlerWrapper  {
     protected void handle(TdApi.Object object) {
         if (getBot().getLoginType() == Bot.LoginType.OCR){
             getBot().getClient().send(new TdApi.RequestQrCodeAuthentication(),this);
-        } else {
+        }else if (getBot().getLoginType() == Bot.LoginType.BOT){
+            getBot().getClient().send(new TdApi.CheckAuthenticationBotToken(getBot().getBotToken()),this);
+        }
+        else {
             TdApi.PhoneNumberAuthenticationSettings settings =
                     new TdApi.PhoneNumberAuthenticationSettings();
             settings.hasUnknownPhoneNumber  = false;
