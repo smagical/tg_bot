@@ -4,11 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.drinkless.tdlib.Client;
 import org.drinkless.tdlib.TdApi;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.PriorityQueue;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -16,6 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ClientUtils {
     public final static int LIMIT = 50;
     public final static int RETRY = 5;
+    public final static long WAITE_TIME = 5 * 1000;
 
     public static Collection<TdApi.Message> getChatHistory(
             Client client,Long chatId,long lastMessageId,int limit
@@ -41,12 +40,13 @@ public class ClientUtils {
                         @Override
                         public void onResult(TdApi.Object object) {
                             switch (object.getConstructor()){
-                                case TdApi.Error.CONSTRUCTOR -> {
+                                case TdApi.Error.CONSTRUCTOR : {
                                     flag.set(false);
                                     latch.countDown();
                                     log.error("{}",object);
+                                    break;
                                 }
-                                case TdApi.Messages.CONSTRUCTOR -> {
+                                case TdApi.Messages.CONSTRUCTOR : {
                                     TdApi.Messages messages = (TdApi.Messages)object;
                                     TdApi.Message[] messagesArray = messages.messages;
                                     for (int i = 0; i < messagesArray.length; i++) {
@@ -60,6 +60,7 @@ public class ClientUtils {
                                         flag.set(false);
                                     }
                                     latch.countDown();
+                                    break;
                                 }
                             }
                         }
@@ -67,7 +68,7 @@ public class ClientUtils {
             );
             if (!res.isEmpty())
                 lastMessageId = res.peek().id;
-            latch.await();
+            latch.await(WAITE_TIME, TimeUnit.MILLISECONDS);
             if (res.size() == lastCount){
                 count.decrementAndGet();
             }else {
@@ -94,8 +95,83 @@ public class ClientUtils {
                 latch.countDown();
             }
         });
-        latch.await();
+        latch.await(WAITE_TIME, TimeUnit.MILLISECONDS);
         return result.length() == 0 ? null : result.toString();
     }
 
+    public static TdApi.Chat getChat(Client client,Long chatId) throws InterruptedException {
+        TdApi.GetChat getChat = new TdApi.GetChat(chatId);
+        CountDownLatch latch = new CountDownLatch(1);
+        final LinkedList<TdApi.Chat> chats = new LinkedList<>();
+        chats.add(null);
+        client.send(
+                getChat,
+                new Client.ResultHandler() {
+                    @Override
+                    public void onResult(TdApi.Object object) {
+                        if (object.getConstructor() == TdApi.Chat.CONSTRUCTOR) {
+                            chats.addLast((TdApi.Chat)object);
+                        }
+                        latch.countDown();
+                    }
+                }
+        );
+        latch.await(WAITE_TIME, TimeUnit.MILLISECONDS);
+        return chats.getLast();
+    }
+
+    public static TdApi.User getUser(Client client, long userId) throws InterruptedException {
+        TdApi.GetUser getUser = new TdApi.GetUser(userId);
+        CountDownLatch latch = new CountDownLatch(1);
+        final LinkedList<TdApi.User> chats = new LinkedList<>();
+        chats.add(null);
+        client.send(
+                getUser,
+                new Client.ResultHandler() {
+                    @Override
+                    public void onResult(TdApi.Object object) {
+                        if (object.getConstructor() == TdApi.User.CONSTRUCTOR) {
+                            chats.addLast((TdApi.User)object);
+                        }
+                        latch.countDown();
+                    }
+                }
+        );
+        latch.await(WAITE_TIME, TimeUnit.MILLISECONDS);
+        return chats.getLast();
+    }
+
+    public static void setCommand(Client client,HashMap<String,String> map,TdApi.BotCommandScope scope){
+        TdApi.BotCommand[] commands =
+                map.entrySet().stream().map(
+                        e->new TdApi.BotCommand(e.getKey(),e.getValue())
+                ).toArray(TdApi.BotCommand[]::new);
+        client.send(
+                new TdApi.SetCommands(
+                        scope,
+                        "zh",
+                        commands
+                ),
+                new Client.ResultHandler() {
+                    @Override
+                    public void onResult(TdApi.Object object) {
+                        if (object.getConstructor() == TdApi.Ok.CONSTRUCTOR) {}
+                        else log.info("{}",object);
+                    }
+                });
+    }
+
+    public static void LeaveChat(Client client,long chatId){
+        client.send(
+                new TdApi.LeaveChat(
+                     chatId
+                ),
+                new Client.ResultHandler() {
+                    @Override
+                    public void onResult(TdApi.Object object) {
+                        if (object.getConstructor() == TdApi.Ok.CONSTRUCTOR) {}
+                        else log.info("{}",object);
+                    }
+                });
+    }
 }

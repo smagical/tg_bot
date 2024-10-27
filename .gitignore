@@ -42,4 +42,7 @@ build/
 tddb
 tdlib.log
 *.log
-**/**/*.log
+**/**/*.log!/base/
+
+base*/
+dll

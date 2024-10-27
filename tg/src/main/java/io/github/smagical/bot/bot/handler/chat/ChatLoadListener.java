@@ -93,6 +93,10 @@ public class ChatLoadListener implements Listener<ChatLoadListener.LoadChatEvent
 
     @Override
     public void onListener(LoadChatEvent event) {
+        if (bot.getLoginType() == Bot.LoginType.BOT){
+            log.info("The method is not available to bots");
+            return;
+        }
         if (!event.getData().getData().equals(LoadChatEvent.ChatType.ALL))
             new Handler(bot,event.getData().getData()).handle(null);
         else

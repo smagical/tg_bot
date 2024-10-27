@@ -27,9 +27,6 @@ public class ChatLastMessageHandler extends BaseHandlerWrapper {
                             )
                     )
             );
-            getBot().send(
-                    new LastMessageEvent(lastMessage)
-            );
         }
     }
 
@@ -40,8 +37,8 @@ public class ChatLastMessageHandler extends BaseHandlerWrapper {
         };
     }
 
-    public class LastMessageEvent extends io.github.smagical.bot.event.message.MessageEvent<TdApi.UpdateChatLastMessage> {
-        private LastMessageEvent(TdApi.UpdateChatLastMessage code) {
+    public class LastMessageEvent extends NewMessageHandler.MessageEvent {
+        private LastMessageEvent(TdApi.Message code) {
             super(code);
         }
     }

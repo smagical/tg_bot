@@ -21,7 +21,7 @@ public class NoopHandler implements HandlerWrapper {
     @Override
     public void onResult(TdApi.Object object) {
         if (!blank.contains(object.getConstructor()))
-            log.debug("\n{}",object.toString());
+            log.info("\n{}",object.toString());
     }
 
     public static NoopHandler getInstance() {

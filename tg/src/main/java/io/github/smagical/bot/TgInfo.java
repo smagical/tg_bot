@@ -10,10 +10,15 @@ public class TgInfo  {
      private final static Properties prop = new Properties();
      public final static boolean DEBUG = false;
      static {
-         String path = System.getProperty("tginfo",
-                 HandlerWrapper.class.getClassLoader().getResource("tg.properties").getPath());
+
+
          try {
-             prop.load(new FileInputStream(path));
+             prop.load(HandlerWrapper.class.getClassLoader().getResourceAsStream("tg.properties"));
+             String path = System.getProperty("tginfo", "");
+             if (!path.equals("")){
+                 prop.load(new FileInputStream(path));
+             }
+
          } catch (IOException e) {
 
          }
@@ -27,7 +32,16 @@ public class TgInfo  {
      public final static String USE_TEST = "use_test";
      public final static String DATABASE_ENCRYPTION_KEY = "database_encryption_key";
      public final static String REQUEST_RETRY = "request_retry";
+    public final static String LUCENE_DIR = "lucene_dir";
+    public final static String LUCENE_ANALYZER = "lucene_analyzer";
+    public final static String PYTHONHOME = "python_home";
+    public final static String JDBC_URL = "jdbc_url";
+    public final static String JDBC_USERNAME = "jdbc_username";
+    public final static String JDBC_PASSWORD = "jdbc_password";
 
+    public final static String LOGIN_TYPE = "login_type";
+    public final static String LOGIN_TOKEN = "login_token";
+    public final static String LOGIN_NUMBER = "login_number";
 
     public static String getProperty(String key) {
          return prop.getProperty(key);

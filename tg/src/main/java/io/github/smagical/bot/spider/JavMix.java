@@ -58,7 +58,7 @@ public class JavMix {
             )
             .setProxySelector(ProxySelector.getDefault())
             .build();
-    //xvideo fc2ppv vr soaring popularity video
+    //xvideo fc2ppv vr soaring popularity
     public static void main(String[] args) throws IOException, ScriptException {
         List<Card> cardList = solvePage(UrlBuilder.newBuilder("https://zh-cn.javmix.tv/video").build());
         for (Card card : cardList) {

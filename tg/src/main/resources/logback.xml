@@ -70,6 +70,9 @@
     <logger name="io.github.smagical.bot.cmd" level="INFO" additivity="false">
         <appender-ref ref="cmdLog" />
     </logger>
+    <logger name="io.github.smagical.bot.bot.handler.NoopHandler" level="DEBUG" additivity="false">
+        <appender-ref ref="cmdLog" />
+    </logger>
     <!-- 根节点，表名基本的日志级别，里面可以由零个或多个<appender-ref>元素，标识那些appender将会添加到这个loger。-->
     <!-- level="info"代表基础日志级别为info。用来设置打印级别，大小写无关：TRACE, DEBUG, INFO, WARN, ERROR, ALL 和 OFF，还有一个特殊值INHERITED或者同义词NULL，代表强制执行上级的级别。 -->
     <root level="INFO">

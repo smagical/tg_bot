@@ -10,8 +10,8 @@ public class ClosedHandler extends BaseHandlerWrapper {
         super(bot);
     }
 
-    public  class ClosedEvent extends BaseEvent{
-        private ClosedEvent() {
+    public  class Closed extends BaseEvent{
+        private Closed() {
             super(null);
         }
     }
@@ -19,7 +19,7 @@ public class ClosedHandler extends BaseHandlerWrapper {
     @Override
     protected void handle(TdApi.Object object) {
         TdApi.AuthorizationStateClosed state = (TdApi.AuthorizationStateClosed) object;
-        getBot().send(new ClosedEvent());
+        getBot().send(new Closed());
     }
 
     @Override

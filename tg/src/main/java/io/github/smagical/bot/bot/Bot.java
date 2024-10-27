@@ -13,9 +13,12 @@ import io.github.smagical.bot.bot.listener.user.chat.LoginForChatInitListener;
 import io.github.smagical.bot.bot.listener.user.chat.message.MessageDispatchListener;
 import io.github.smagical.bot.bot.model.ChatMap;
 import io.github.smagical.bot.bot.model.UserMap;
+import io.github.smagical.bot.bot.util.ClientUtils;
 import io.github.smagical.bot.bus.MessageDispatch;
+import io.github.smagical.bot.cmd.MainCmd;
 import io.github.smagical.bot.event.user.LoginEvent;
 import io.github.smagical.bot.listener.Listener;
+import io.github.smagical.bot.plugin.PluginInitListener;
 import org.drinkless.tdlib.Client;
 import org.drinkless.tdlib.TdApi;
 
@@ -63,11 +66,11 @@ public class Bot extends MessageDispatch implements io.github.smagical.bot.Bot {
             login(LoginType.PHONE_NUMBER);
         }
     }
-    public void loginByBotToken() {
+    public void loginByBotToken(String botToken) {
         checkRunning();
         synchronized (isRunning){
-            this.botToken = phoneNumber;
-            this.id = botToken;
+            this.botToken = botToken;
+            this.id = botToken.replace(":","_");
             login(LoginType.BOT);
         }
     }
@@ -123,6 +126,9 @@ public class Bot extends MessageDispatch implements io.github.smagical.bot.Bot {
         addListener(new MessageDispatchListener(this));
 
         addListener(new GetMeHandler());
+
+        addListener(new PluginInitListener(this));
+        addListener(new MainCmd.CmdListener(this));
     }
 
 
@@ -154,8 +160,18 @@ public class Bot extends MessageDispatch implements io.github.smagical.bot.Bot {
         return true;
     }
 
-    public TdApi.Chat getChat(long id) {
-        return chatMap.getChat(id);
+
+    public TdApi.Chat getChat(long chatId) {
+        TdApi.Chat chat = chatMap.getChat(chatId);
+        if (chat == null){
+            try {
+                chat = ClientUtils.getChat(getClient(),chatId);
+                if (chat != null)
+                   addChat(chat);
+            } catch (InterruptedException e) {
+            }
+        }
+        return chat;
     }
 
     public TdApi.SecretChat getSecretChat(long id) {
@@ -170,9 +186,19 @@ public class Bot extends MessageDispatch implements io.github.smagical.bot.Bot {
         return chatMap;
     }
 
-    public TdApi.User getUser(long id) {
-        return users.getUser(id);
+    public TdApi.User getUser(long userId) {
+        TdApi.User user = users.getUser(userId);
+        if (user == null){
+            try {
+                user = ClientUtils.getUser(getClient(),userId);
+                if (user != null)
+                    addUser(user);
+            } catch (InterruptedException e) {
+            }
+        }
+        return user;
     }
+
     public TdApi.UserFullInfo getUserFullInfo(long id) {
         return users.getFullInfo(id);
     }

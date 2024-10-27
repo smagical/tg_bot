@@ -1,6 +1,9 @@
 package io.github.smagical.bot.cmd;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import io.github.smagical.bot.bot.Bot;
 import io.github.smagical.bot.bot.util.ClientUtils;
 import io.github.smagical.bot.util.DbUtil;
@@ -11,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static io.github.smagical.bot.cmd.MainCmd.printSplit;
 import static io.github.smagical.bot.cmd.MainCmd.select;
@@ -18,6 +22,7 @@ import static io.github.smagical.bot.cmd.MainCmd.select;
 @Slf4j
 public class SpiderCmdHandler implements Cmd{
     private final static int CHUNCK = 200;
+    private final static int SAME = 100;
     private final static SpiderCmdHandler cmdHandler = new SpiderCmdHandler();
 
     final public static SpiderCmdHandler getInstance() {
@@ -29,7 +34,7 @@ public class SpiderCmdHandler implements Cmd{
             printSplit();
             log.info("###################  Spider Menu  #########################");
             log.info("select\tid\ttitle");
-            List<TdApi.Chat> chats = bot.getAllChats().getAllChat().stream().toList();
+            List<TdApi.Chat> chats = bot.getAllChats().getAllChat().stream().collect(Collectors.toList());
             for (int i = 0; i < chats.size(); i++) {
                 log.info("{}\t{}\t{}",i,chats.get(i).id,chats.get(i).title);
             }
@@ -72,9 +77,9 @@ public class SpiderCmdHandler implements Cmd{
                     try {
                         limit = Integer.parseInt(select("请输入limit -1表示直到数据库中存在停止:\n"));
                     }catch (Exception e){}
-                    spider(bot,chatId,messageID,limit);
+                    spider(bot,chatId,messageID,limit,limit>0?limit/4:Integer.MAX_VALUE);
                 }else if ("1".equals(select)){
-                    spider(bot,chatId,0,-1);
+                    spider(bot,chatId,0,-1,SAME);
                 }else if ("2".equals(select)){
                     return;
                 }
@@ -83,10 +88,10 @@ public class SpiderCmdHandler implements Cmd{
         }
     }
 
-    public static void spider(Bot bot,Long chatId,long messageID,int limit) {
-        boolean all = false;
+    public static void spider(Bot bot,Long chatId,long messageID,int limit,int same) {
+        int all = Integer.MAX_VALUE;
         if (limit == -1) {
-            all = true;
+            all = same;
             limit = Integer.MAX_VALUE/2;
         }
         int count = (limit + CHUNCK -1)/CHUNCK;
@@ -94,7 +99,7 @@ public class SpiderCmdHandler implements Cmd{
             try {
                 Collection<TdApi.Message>  messages =
                         ClientUtils.getChatHistory(bot.getClient(),chatId,messageID,limit > CHUNCK?CHUNCK:limit);
-                if (messages.isEmpty()) break;
+                if (messages.isEmpty()) return;
                 for (TdApi.Message message : messages) {
                     TgMessage tgMessage = new TgMessage();
                     tgMessage.album = message.mediaAlbumId;
@@ -102,20 +107,23 @@ public class SpiderCmdHandler implements Cmd{
                     tgMessage.chatId = chatId;
                     tgMessage.other = new HashMap<>();
                     switch (message.content.getConstructor()){
-                        case TdApi.MessageText.CONSTRUCTOR -> {
+                        case TdApi.MessageText.CONSTRUCTOR : {
                             solveText((TdApi.MessageText)message.content,tgMessage);
                             break;
-                        }case TdApi.MessagePhoto.CONSTRUCTOR -> {
+                        }case TdApi.MessagePhoto.CONSTRUCTOR : {
                             solvePhoto((TdApi.MessagePhoto)message.content,tgMessage);
                             break;
-                        }case TdApi.MessageVideo.CONSTRUCTOR -> {
+                        }case TdApi.MessageVideo.CONSTRUCTOR : {
                             solveVideo((TdApi.MessageVideo)message.content,tgMessage);
                             break;
                         }
                     }
                     if (exits(message.id,chatId) ) {
-                        if (all)
-                         break;
+                       // log.info("{}:{} arrady exits",chatId,message);
+                        if (all <= 0)
+                            return;
+                        else
+                            all--;
                     } else  save(bot,tgMessage);
 
                 }
@@ -134,7 +142,7 @@ public class SpiderCmdHandler implements Cmd{
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()){
                 Long id = resultSet.getLong(1);
-                spider(bot,id,0,-1);
+                spider(bot,id,0,-1,SAME);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -182,6 +190,7 @@ public class SpiderCmdHandler implements Cmd{
                         bot.getClient(), message.chatId, message.id
                 );
             }
+            log.debug("{} save",message);
             PreparedStatement statement = DbUtil.getConnection()
                     .prepareStatement(INSERT);
             statement.setLong(1,message.id);
@@ -229,13 +238,50 @@ public class SpiderCmdHandler implements Cmd{
     private static final String SELECT_CHAT_ID =
             "SELECT DISTINCT tg_messages.chat_id FROM tg_messages";
 
-    private static class TgMessage{
+    public static class TgMessage{
         long id;
         long album;
         long chatId;
         String content;
         String link;
         Map<String,Object> other;
+
+        public long getId() {
+            return id;
+        }
+
+        public long getAlbum() {
+            return album;
+        }
+
+        public long getChatId() {
+            return chatId;
+        }
+
+        public String getContent() {
+            return content;
+        }
+
+        public String getLink() {
+            return link;
+        }
+
+        public Map<String, Object> getOther() {
+            return other;
+        }
+
+        @Override
+        public String toString() {
+            try {
+                return JsonMapper
+                        .builder()
+                        .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+                        .build()
+                        .writeValueAsString(this);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
 }

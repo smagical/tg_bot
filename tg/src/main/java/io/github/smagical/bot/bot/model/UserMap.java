@@ -3,8 +3,6 @@ package io.github.smagical.bot.bot.model;
 
 import org.drinkless.tdlib.TdApi;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class UserMap  {
@@ -87,8 +85,5 @@ public class UserMap  {
         return true;
     }
 
-    public Collection<Entity> getEntities() {
-        return Collections.unmodifiableMap(entitys).values();
-    }
 
 }

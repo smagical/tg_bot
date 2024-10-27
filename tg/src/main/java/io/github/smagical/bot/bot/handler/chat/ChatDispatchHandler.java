@@ -3,11 +3,13 @@ package io.github.smagical.bot.bot.handler.chat;
 import io.github.smagical.bot.bot.Bot;
 import io.github.smagical.bot.bot.handler.DispatchHandler;
 import io.github.smagical.bot.bot.handler.chat.update.*;
+import io.github.smagical.bot.bot.handler.chat.update.bot.NewCallbackQueryHandler;
 import io.github.smagical.bot.bot.handler.chat.update.info.*;
 import io.github.smagical.bot.bot.handler.chat.update.message.ChatDraftMessageHandler;
 import io.github.smagical.bot.bot.handler.chat.update.message.ChatLastMessageHandler;
-import io.github.smagical.bot.bot.handler.chat.update.ui.ChatPositionHandler;
+import io.github.smagical.bot.bot.handler.chat.update.message.NewMessageHandler;
 import io.github.smagical.bot.bot.handler.chat.update.ui.ChatBackgroundHandler;
+import io.github.smagical.bot.bot.handler.chat.update.ui.ChatPositionHandler;
 import io.github.smagical.bot.bot.handler.chat.update.ui.ChatThemeHandler;
 
 public class ChatDispatchHandler extends DispatchHandler {
@@ -29,17 +31,20 @@ public class ChatDispatchHandler extends DispatchHandler {
         addHandler(new ChatBackgroundHandler(bot));
         addHandler(new ChatThemeHandler(bot));
 
+        //message
+        addHandler(new ChatLastMessageHandler(bot));
+        addHandler(new NewMessageHandler(bot));
+        addHandler(new ChatDraftMessageHandler(bot));
 
         //update
         addHandler(new ChatActionBarHandler(bot));
         addHandler(new ChatAvailableReactionsHandler(bot));
         addHandler(new ChatBlockListHandler(bot));
-        addHandler(new ChatDraftMessageHandler(bot));
         addHandler(new ChatHasProtectedContentHandler(bot));
         addHandler(new ChatHasScheduledMessagesHandler(bot));
         addHandler(new ChatIsMarkedAsUnreadHandler(bot));
         addHandler(new ChatIsTranslatableHandler(bot));
-        addHandler(new ChatLastMessageHandler(bot));
+
 
         addHandler(new ChatMessageAutoDeleteTimeHandler(bot));
         addHandler(new ChatMessageSenderHandler(bot));
@@ -56,6 +61,9 @@ public class ChatDispatchHandler extends DispatchHandler {
         addHandler(new MessageUnreadReactionsHandler(bot));
         addHandler(new NewChatHandler(bot));
         addHandler(new SecretChatHandler(bot));
+
+        //bot
+        addHandler(new NewCallbackQueryHandler(bot));
     }
 
 }

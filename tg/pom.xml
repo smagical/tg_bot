@@ -11,15 +11,16 @@
     <artifactId>tg</artifactId>
     <version>1.0-SNAPSHOT</version>
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <lucene.version>10.0.0</lucene.version>
     </properties>
     <dependencies>
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
-            <version>1.16.2</version>
+            <version>1.17.2</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
         <dependency>
@@ -36,7 +37,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>2.16.2</version>
+            <version>2.17.2</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -49,14 +50,9 @@
             <version>2.17.2</version>
         </dependency>
         <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>4.10.0</version>
-        </dependency>
-        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.32</version>
+            <version>1.18.34</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.openjdk.nashorn/nashorn-core -->
         <dependency>
@@ -100,6 +96,111 @@
             <version>3.5.3</version>
         </dependency>
 
+<!--        lucene-->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analysis-common</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.apache.lucene</groupId>-->
+<!--            <artifactId>lucene-highlighter</artifactId>-->
+<!--            <version>${lucene.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.apache.lucene</groupId>-->
+<!--            <artifactId>lucene-queryparser</artifactId>-->
+<!--            <version>${lucene.version}</version>-->
+<!--        </dependency>-->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-queries</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.apache.lucene</groupId>-->
+<!--            <artifactId>lucene-memory</artifactId>-->
+<!--            <version>${lucene.version}</version>-->
+<!--        </dependency>-->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-misc</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-sandbox</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.apache.lucene</groupId>-->
+<!--            <artifactId>lucene-suggest</artifactId>-->
+<!--            <version>${lucene.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.apache.lucene</groupId>-->
+<!--            <artifactId>lucene-join</artifactId>-->
+<!--            <version>${lucene.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.apache.lucene</groupId>-->
+<!--            <artifactId>lucene-grouping</artifactId>-->
+<!--            <version>${lucene.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.apache.lucene</groupId>-->
+<!--            <artifactId>lucene-expressions</artifactId>-->
+<!--            <version>${lucene.version}</version>-->
+<!--        </dependency>-->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-facet</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+
+<!--        &lt;!&ndash; https://mvnrepository.com/artifact/org.apache.lucene/lucene-demo &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.apache.lucene</groupId>-->
+<!--            <artifactId>lucene-demo</artifactId>-->
+<!--            <version>${lucene.version}</version>-->
+<!--        </dependency>-->
+
+
+        <dependency>
+            <groupId>com.hankcs.nlp</groupId>
+            <artifactId>hanlp-lucene-plugin</artifactId>
+            <version>1.1.7</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.hankcs</groupId>
+                    <artifactId>hanlp</artifactId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>lucene-analyzers-common</artifactId>
+                    <groupId>org.apache.lucene</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>lucene-core</artifactId>
+                    <groupId>org.apache.lucene</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>lucene-queryparser</artifactId>
+                    <groupId>org.apache.lucene</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.hankcs/hanlp -->
+        <dependency>
+            <groupId>com.hankcs</groupId>
+            <artifactId>hanlp</artifactId>
+            <version>portable-1.8.4</version>
+        </dependency>
+
         <dependency>
             <groupId>io.github.smagical.bot</groupId>
             <artifactId>common</artifactId>
@@ -111,19 +212,125 @@
             <artifactId>org.drinkless.tdlib</artifactId>
             <version>1.8</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/libs/dir/tdlib.jar</systemPath>
+            <systemPath>${project.basedir}/libs/win/dir/tdlib.jar</systemPath>
         </dependency>
+
 
     </dependencies>
     <build>
-        <resources>
-            <resource>
-                <directory>libs</directory>
-                <targetPath>/</targetPath>
-                <includes>
-                    <include>**/*.jar</include>
-                </includes>
-            </resource>
-        </resources>
+<!--        <resources>-->
+<!--            <resource>-->
+<!--                <directory>libs</directory>-->
+<!--                <targetPath>/</targetPath>-->
+<!--                <includes>-->
+<!--                    <include>**/*.jar</include>-->
+<!--                </includes>-->
+<!--            </resource>-->
+<!--        </resources>-->
+        <plugins>
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-compiler-plugin</artifactId>-->
+<!--                <configuration>-->
+<!--                    <source>21</source>-->
+<!--                    <target>21</target>-->
+<!--                </configuration>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>copy</id>-->
+<!--                        <phase>package</phase>-->
+<!--                        <configuration>-->
+<!--                            <outputDirectory>-->
+<!--                                ${project.build.directory}/lib-->
+<!--                            </outputDirectory>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
+            <plugin>
+                <!-- 需要指定启动类，否则报错。-->
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <configuration>
+                        <archive>
+                            <!-- 生成的项目JAR包中，不要包含pom.xml和pom.properties这两个文件 -->
+                            <addMavenDescriptor>true</addMavenDescriptor>
+                            <manifest>
+                                <!-- 是否要把第三方依赖的JAR包加入到类构建路径 -->
+                                <addClasspath>true</addClasspath>
+                                <!-- 外部依赖JAR包的存放路径，为了在MANIFEST.MF文件中指定外部依赖的路径 -->
+                                <classpathPrefix>lib/</classpathPrefix>
+                                <!-- 项目主启动类 -->
+                                <mainClass>io.github.smagical.bot.Main</mainClass>
+                            </manifest>
+                        </archive>
+                    </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.7.1</version>
+                <executions>
+                    <execution>
+                        <id>win</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <!-- 是否要把第三方依赖的JAR包加入到类构建路径 -->
+                                    <addClasspath>true</addClasspath>
+                                    <!-- 外部依赖JAR包的存放路径，为了在MANIFEST.MF文件中指定外部依赖的路径 -->
+                                    <classpathPrefix>lib</classpathPrefix>
+                                    <mainClass>
+                                        io.github.smagical.bot.Main
+                                    </mainClass>
+
+                                </manifest>
+                            </archive>
+                            <descriptors>
+                                <descriptor>${project.basedir}/assembly/assembly-win.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>freebsd</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <!-- 是否要把第三方依赖的JAR包加入到类构建路径 -->
+                                    <addClasspath>true</addClasspath>
+                                    <!-- 外部依赖JAR包的存放路径，为了在MANIFEST.MF文件中指定外部依赖的路径 -->
+                                    <classpathPrefix>lib</classpathPrefix>
+                                    <mainClass>
+                                        io.github.smagical.bot.Main
+                                    </mainClass>
+
+                                </manifest>
+                            </archive>
+                            <descriptors>
+                                <descriptor>${project.basedir}/assembly/assembly-freebsd.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+
     </build>
+    <repositories>
+        <repository>
+            <id>central-repos</id>
+
+            <name>Central Repository</name>
+            <layout>default</layout>
+            <url>https://repo.maven.apache.org/maven2</url>
+        </repository>
+    </repositories>
 </project>

@@ -9,6 +9,7 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
+
 @Slf4j
 public class QRUtil {
     public static void printf(String contents) throws WriterException {

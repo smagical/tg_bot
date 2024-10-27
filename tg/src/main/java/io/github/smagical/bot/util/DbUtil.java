@@ -1,16 +1,24 @@
 package io.github.smagical.bot.util;
 
+import io.github.smagical.bot.TgInfo;
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
+import java.util.List;
 
+@Slf4j
 public class DbUtil {
-    private static String jdbcURL = "jdbc:postgresql://localhost:5432/tg_bot";
-    private static String jdbcUsername = "postgres";
-    private static String jdbcPassword = "980920";
+    private static String jdbcURL = TgInfo.getProperty(TgInfo.JDBC_URL);
+    private static String jdbcUsername = TgInfo.getProperty(TgInfo.JDBC_USERNAME);
+    private static String jdbcPassword = TgInfo.getProperty(TgInfo.JDBC_PASSWORD);
     private static Connection conn;
+    private final static List<String> fileList =
+            Arrays.asList("ip.sql", "tg_bot_group.sql", "tg_messages.sql");
 
     static {
         try {
@@ -21,22 +29,13 @@ public class DbUtil {
         } catch (ClassNotFoundException e) {
 
         }
-
-        String path = DbUtil.class.getClassLoader()
-                .getResource(".")
-                .getPath();
-        File[] sql = new File(path).listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.endsWith(".sql");
-            }
-        });
-
-        for (File file : sql) {
+        for (String sql : fileList) {
             try (
-                    FileReader reader = new FileReader(file);
-                     BufferedReader br = new BufferedReader(reader)
-                 ){
+                    InputStreamReader reader = new InputStreamReader(
+                            DbUtil.class.getClassLoader().getResourceAsStream(sql)
+                    );
+                    BufferedReader br = new BufferedReader(reader)
+            ){
                 StringBuilder builder = new StringBuilder();
                 br.lines().forEach(builder::append);
                 Statement statement = getConnection().createStatement();
@@ -48,6 +47,8 @@ public class DbUtil {
                 e.printStackTrace();
             }
         }
+
+
 
     };
     public static Connection getConnection() {

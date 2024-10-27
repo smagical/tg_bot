@@ -1,10 +1,7 @@
 package io.github.smagical.bot.bot.model;
 
 import org.drinkless.tdlib.TdApi;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ChatMap {
@@ -12,7 +9,7 @@ public class ChatMap {
     private ConcurrentHashMap<Long, TdApi.SecretChat> secretChatMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Long, TdApi.Chat> chatMap = new ConcurrentHashMap<>();
 
-    public TdApi.Object put(@NotNull Long key, @NotNull TdApi.Object value) {
+    public TdApi.Object put(Long key,TdApi.Object value) {
         if (value instanceof TdApi.SecretChat) {
             return secretChatMap.put(key, (TdApi.SecretChat) value);
         }else {
@@ -52,12 +49,5 @@ public class ChatMap {
             return true;
         }
         return false;
-    }
-
-    public Collection<TdApi.Chat> getAllChat(){
-        return Collections.unmodifiableMap(chatMap).values();
-    }
-    public Collection<TdApi.SecretChat> getAllSecretChat(){
-        return Collections.unmodifiableMap(secretChatMap).values();
     }
 }
